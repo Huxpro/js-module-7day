@@ -1,0 +1,1137 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>JavaScript Modularization Seven Day</title>
+
+        <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+        <meta name="author" content="Hakim El Hattab">
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/wx.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+
+                <section data-markdown>
+                    <script type="text/template">
+                        # JavaScript Modularization *Seven Day*
+                        ### JavaScript 模块化*七日谈*
+                        <small>
+                            <a href="http://huangxuan.me">黄玄</a> /
+                            <a href="http://weibo.com/huxpro">@Huxpro</a>
+                        </small>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <img src="attach/hux.jpg" style="
+                            width: 200px;
+                            border-radius: 50%;
+                        "/>
+                        ## 黄玄
+                        微信电影票前端工程师
+
+                        <small>前阿里巴巴前端工程师</small>
+
+                        <small>
+                            <a href="http://huangxuan.me">Blog</a> /
+                            <a href="http://weibo.com/huxpro">@Huxpro</a> /
+                            <a href="https://github.com/huxpro">GitHub</a> /
+                            <a href="http://www.zhihu.com/people/huxpro">知乎</a>
+                        </small>
+                    </script>
+                </section>
+<!-- 第一日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第一日 上古时期
+
+                        # *Module?*
+
+                        从设计模式说起
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        最早，我们这么写代码
+
+                        ```javascript
+                        function foo(){
+                            //...
+                        }
+                        function bar(){
+                            //...
+                        }
+                        ```
+
+                        Global 被污染，很容易命名冲突
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        简单封装：*Namespace* 模式
+
+                        ```javascript
+                        var MYAPP = {
+                            foo: function(){},
+                            bar: function(){}
+                        }
+
+                        MYAPP.foo();
+                        ```
+
+                        - 减少 Global 上的变量数目
+                        <!-- .element: class="fragment" -->
+
+                        - 本质是对象，一点都不安全
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        匿名闭包 ：*IIFE* 模式
+
+                        ```javascript
+                        var Module = (function(){
+                            var _private = "safe now";
+                            var foo = function(){
+                                console.log("Foo")
+                            }
+
+                            return {
+                                foo: foo
+                            }
+                        })()
+
+                        Module.foo();
+                        Module._private; // undefined
+                        ```
+
+                        函数是 JavaScript 唯一的 Local Scope
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        再增强一点 ：引入依赖
+
+                        ```javascript
+                        var Module = (function($){
+                            var foo = function(){
+                                console.log("wow, I can use jQuery now");
+                                console.info($);
+                            }
+
+                            return {
+                                foo: foo
+                            }
+                        })(jQuery)
+
+                        Module.foo();
+
+                        ```
+
+                        <p class="fragment">
+                            这就是<em><b>模块模式</b></em><br>
+                            也是现代模块实现的基石
+                        </p>
+                    </script>
+                </section>
+
+<!-- 第二日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第二日 石器时代
+
+                        # *Script Loader*
+
+                        只有封装性可不够，我们还需要加载
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## Let's back to script tags
+
+                        ```jade
+                        body
+                            script(src="jquery.js")
+                            script(src="app.js")    // do some $ things...
+                        ```
+
+                        Order is essential
+                        <!-- .element: class="fragment" -->
+
+                        Load in parallel
+                        <!-- .element: class="fragment" -->
+
+                        DOM 顺序即执行顺序
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        但现实是这样的…
+
+                        ```
+                        body
+                            script(src="zepto.js")
+                            script(src="jhash.js")
+                            script(src="fastClick.js")
+                            script(src="iScroll.js")
+                            script(src="underscore.js")
+                            script(src="handlebar.js")
+                            script(src="datacenter.js")
+                            script(src="deferred.js")
+                            script(src="util/wxbridge.js")
+                            script(src="util/login.js")
+                            script(src="util/base.js")
+                            script(src="util/city.js")
+                            script(src="util/date.js")
+                            script(src="util/cookie.js")
+                            script(src="app.js")
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown data-background="attach/bm_1.jpg"
+                    style="background:rgba(0,0,0,0.8)"
+                >
+                    <script type="text/template">
+                        - 难以维护 *Very difficult to maintain!*
+
+                        - 依赖模糊 *Unclear Dependencies*
+
+                        - 请求过多 *Too much HTTP calls*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [LABjs](http://labjs.com/) - script loader
+
+                        (2009)
+
+                        Loading And Blocking JavaScript
+
+
+                        > *Using LABjs will replace all that ugly <br >"script tag soup"*
+
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        How Does It Works?
+
+                        ```
+                        script(src="LAB.js" async)
+                        ```
+
+                        ```javascript
+                        $LAB.script("framework.js").wait()
+                            .script("plugin.framework.js")
+                            .script("myplugin.framework.js").wait()
+                            .script("init.js");
+                        ```
+                        <blockquote class="fragment"><p>Executed in parallel? </p></blockquote>
+
+                        *First-come, First-served <br> (when execution order is not important)*
+                        <!-- .element: class="fragment" -->
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        #### Sugar
+
+                        ```javascript
+                        $LAB
+                        .script( [ "script1.js", "script2.js", "script3.js"] )
+                        .wait(function(){ // wait for all scripts to execute first
+                            script1Func();
+                            script2Func();
+                            script3Func();
+                        });
+                        ```
+                        *Dependency Management<br>基于文件的依赖管理*
+                        <!-- .element: class="fragment" -->
+
+                    </script>
+                </section>
+
+<!-- 第三日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第三日 蒸汽朋克
+
+                        # *Module Loader*
+
+                        模块化架构的工业革命
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [YUI3](yuilibrary.com) Loader - Module Loader
+                        (2009)
+
+                        <img src="attach/yui-logo.png" class="logo" style="max-width:150px" />
+
+                        > *YUI's lightweight core and <br>**modular architecture**<br> make it scalable, fast, and robust.*
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        回顾昔日王者的风采:
+
+                        ```javascript
+                        // YUI - 编写模块
+                        YUI.add('dom', function(Y) {
+                          Y.DOM = { ... }
+                        })
+
+                        // YUI - 使用模块
+                        YUI().use('dom', function(Y) {
+                          Y.DOM.doSomeThing();
+                          // use some methods DOM attach to Y
+                        })
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        Creating Custom Modules
+
+                        ```javascript
+                        // hello.js
+                        YUI.add('hello', function(Y){
+                            Y.sayHello = function(msg){
+                                Y.DOM.set(el, 'innerHTML', 'Hello!');
+                            }
+                        },'3.0.0',{
+                            requires:['dom']
+                        })
+                        ```
+                        ```
+                        // main.js
+                        YUI().use('hello', function(Y){
+                            Y.sayHello("hey yui loader");
+                        })
+                        ```
+
+                        *基于模块的依赖管理*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        Let's Go A Little Deeper
+
+                        ```javascript
+                        // Sandbox Implementation
+                        function Sandbox() {
+                            // ...
+                            // initialize the required modules
+                            for (i = 0; i < modules.length; i += 1) {
+                                Sandbox.modules[modules[i]](this);
+                            }
+                            // ...
+                        }
+                        ```
+
+                        Y 其实是一个强沙箱
+                        <!-- .element: class="fragment" -->
+
+                        所有依赖模块通过 attach 的方式被注入沙盒
+                        <!-- .element: class="fragment" -->
+
+                        *attach：在当前 YUI 实例上执行模块的初始化代码，使得模块在当前实例上可用*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        Still "Script Tag Soup"?
+
+                        ```javascript
+                        script(src="/path/to/yui-min.js")       // YUI seed
+                        script(src="/path/to/my/module1.js")    // add('module1')
+                        script(src="/path/to/my/module2.js")    // add('module2')
+                        script(src="/path/to/my/module3.js")    // add('module3')
+                        ```
+                        ```
+                        YUI().use('module1', 'module2', 'module3', function(Y) {
+                            // you can use all this module now
+                        });
+                        ```
+
+                        <em>
+                            <ul class="fragment">
+                                <li>you don't have to include script tags in a set order</li>
+                                <li>separation of loading from execution</li>
+                            </ul>
+                        </em>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        漏了一个问题？ *Too much HTTP calls*
+                        <!-- .element: class="fragment" -->
+
+                        ## YUI Combo
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        How Combo Work
+
+                        ```jade
+                        script(src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js")
+                        script(src="http://yui.yahooapis.com/3.0.0/build/dom/dom-min.js")
+                        ```
+
+                        ↓ <small style="margin:14px"> magic combo </small>
+
+                        ```jade
+                        script(src="http://yui.yahooapis.com/combo?
+                            3.0.0/build/yui/yui-min.js&
+                            3.0.0/build/dom/dom-min.js")
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        *Serves multiple files in a single request*
+                        <!-- .element: class="fragment" -->
+
+                        GET 请求，需要服务器支持
+                        <!-- .element: class="fragment" -->
+
+                        [alibaba/nginx-http-concat](https://github.com/alibaba/nginx-http-concat)
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        Code Optimize Tool
+
+                        - 合并 *Concat*
+
+                        - 压缩 *Minify*
+
+                        - 混淆 *Uglify*
+
+                    </script>
+                </section>
+
+<!-- 第四日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第四日 号角吹响
+
+                        # *CommonJS*
+
+                        征服世界的第一步是跳出浏览器
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [CommonJS](http://www.commonjs.org/) - API Standard
+
+                        (2009.08)
+
+                        <img src="attach/commonjs-logo.png" class="logo" style="max-width:200px" />
+
+                        > *javascript:<br> not just for browsers any more!*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        # [Modules/1.0](http://wiki.commonjs.org/wiki/Modules/1.0)
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        模块的定义与引用
+
+                        ```javascript
+                        // math.js
+                        exports.add = function(a, b){
+                            return a + b;
+                        }
+                        ```
+                        ```javascript
+                        // main.js
+                        var math = require('math')      // ./math in node
+                        console.log(math.add(1, 2));    // 3
+                        ```
+
+                        *Magic Free Variable*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        [NodeJS](http://nodejs.org) : Simple HTTP Server
+
+                        ```javascript
+                        // server.js
+                        var http = require("http"),
+                            PORT = 8000;
+
+                        http.createServer(function(req, res){
+                            res.end("Hello World");
+                        }).listen(PORT);
+
+                        console.log("listenning to " + PORT);
+                        ```
+                        ```
+                        $ node server.js
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        #### Sync Load
+
+                        ```javascript
+                        // timeout.js
+                        var EXE_TIME = 2;
+
+                        (function(second){
+                            var start = +new Date();
+                            while(start + second*1000 > new Date()){}
+                        })(EXE_TIME)
+
+                        console.log("2000ms executed")
+                        ```
+                        ```
+                        // main.js
+                        require('./timeout');   // sync load
+                        console.log('done!');
+                        ```
+
+                        *同步/阻塞式加载*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        同步加载对服务器/本地环境并不是问题
+
+                        <br>
+
+                         硬盘 I/O | | 网速 I/O
+                        -----|------- | ------|-------
+                        HDD: | *100 MB/s*  | ADSL: | *4 Mb/s*
+                        SSD: | *600 MB/s*  | 4G: | *100 Mb/s*
+                        SATA-III:| *6000 Mb/s*  | Fiber: | *100 Mb/s*
+
+                        <br>
+
+                        ### *浏览器环境才是问题！*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+<!-- 第五日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第五日 双塔奇兵
+
+                        # *AMD/CMD*
+
+                        浏览器环境模块化方案
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        分歧和冲突
+
+                        ## *[Modules/Async](http://wiki.commonjs.org/wiki/Modules/AsynchronousDefinition)*
+                        ## *[Modules/Wrappings](http://wiki.commonjs.org/wiki/Modules/Wrappings)*
+
+                        <div class="fragment">
+
+                        <h3>*Modules/Transport*</h3>
+                        <h4>*<del>Modules/2.0</del>*</h4>
+
+                        </div>
+
+                        <small style="margin-top:15px">
+                            [《前端模块化开发的那点历史》](https://github.com/seajs/seajs/issues/588)
+                        </small>
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## *[AMD(Async Module Definition)](http://wiki.commonjs.org/wiki/Modules/AsynchronousDefinition)*
+
+                        RequireJS 对模块定义的规范化产出
+
+                        <br>
+
+                        ## *[CMD(Common Module Definition)](https://github.com/cmdjs/specification/blob/master/draft/module.md)*
+
+                        SeaJS 对模块定义的规范化产出
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [RequireJS](http://requirejs.org/) - AMD Implementation
+
+                        (2011)
+
+                        <img src="attach/requirejs-logo.svg"
+                            class="logo"
+                            style="max-width:130px; margin:0px" />
+
+                        > *JavaScript file and module loader.<br> It is optimized for in-browser use*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        If `require()` is async?
+
+                        ```
+                        //CommonJS Syntax
+                        var Employee = require("types/Employee");
+
+                        function Programmer (){
+                            //do something
+                        }
+
+                        Programmer.prototype = new Employee();
+
+                        //如果 require call 是异步的，那么肯定 error
+                        //因为在执行这句前 Employee 模块根本来不及加载进来
+                        ```
+
+                        *this code will not work*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ***Function Wrapping***
+
+                        ```
+                        //AMD Wrapper
+                        define(
+                            ["types/Employee"],  //依赖
+                            function(Employee){  //这个回调会在所有依赖都被加载后才执行
+                                function Programmer(){
+                                    //do something
+                                };
+
+                                Programmer.prototype = new Employee();
+                                return Programmer;  //return Constructor
+                            }
+                        )
+
+                        ```
+                        looks familiar?
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *Sugar - simplified CommonJS wrapping*
+
+                        ```javascript
+                        define(function (require) {
+                            var dependency1 = require('dependency1'),
+                                dependency2 = require('dependency2');
+
+                            return function () {};
+                        });
+                        ```
+                        ```javascript
+                        // parse out require...
+                        define(
+                            ['require', 'dependency1', 'dependency2'],
+                        function (require) {
+                            var dependency1 = require('dependency1'),
+                                dependency2 = require('dependency2');
+
+                            return function () {};
+                        });
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *AMD vs CommonJS*
+
+                        ### 书写风格
+
+                        ```javascript
+                        // Module/1.0
+                        var a = require("./a");  // 依赖就近
+                        a.doSomething();
+
+                        var b = require("./b")
+                        b.doSomething();
+                        ```
+
+                        ```javascript
+                        // AMD recommended style
+                        define(["a", "b"], function(a, b){ // 依赖前置
+                            a.doSomething();
+                            b.doSomething();
+                        })
+                        ```
+
+                        *Both OK*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *AMD vs CommonJS*
+
+                        ### 执行时机
+
+                        ```
+                        // Module/1.0
+                        var a = require("./a");  // 执行到此时，a.js 同步下载并执行
+                        ```
+
+                        ```
+                        // AMD with CommonJS sugar
+                        define(["require"], function(require){
+                            // 在这里， a.js 已经下载并且执行好了
+                            var a = require("./a")
+                        })
+
+                        ```
+
+                        *Early Download, Early Executing*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [SeaJS](http://seajs.org/docs/) - CMD Implementation
+
+                        (2011)
+
+                        <img src="attach/seajs-logo.png" class="logo" />
+
+                        > *Extremely simple experience of modular development*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *More like CommonJS Style*
+
+                        ```javascript
+                        define(function(require, exports) {
+                            var a = require('./a');
+                            a.doSomething();
+
+                            exports.foo = 'bar';
+                            exports.doSomething = function() {};
+                        });
+                        ```
+                        ```javascript
+                        // RequireJS 兼容风格
+                        define('hello', ['jquery'], function(require, exports, module) {
+                            return {
+                                foo: 'bar',
+                                doSomething: function() {}
+                            };
+                        });
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *AMD vs CMD - the truly different*
+
+                        ### Still Execution Time
+
+                        ```
+                        // AMD recommended
+                        define(['a', 'b'], function(a, b){
+                            a.doSomething();    // 依赖前置，提前执行
+                            b.doSomething();
+                        })
+                        ```
+                        ```
+                        // CMD recommanded
+                        define(function(require, exports, module){
+                            var a = require("a");
+                            a.doSomething();
+                            var b = require("b");
+                            b.doSomething();    // 依赖就近，延迟执行
+                        })
+
+                        ```
+
+                        *Early Download, Lazy Executing*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *RequireJS 配置与实践*
+
+                        - baseUrl
+                        - parhs & moduleID
+                        - shim
+                        - opimized build & r.js
+
+
+                    </script>
+                </section>
+
+<!-- 第六日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第六日 精灵宝钻
+
+                        # *Browserify/Webpack*
+
+                        大势所趋，去掉这层包裹！
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [Browserify](http://browserify.org/) - CommonJS in browser
+
+                        (2011 / 2014 stable)
+
+                        <img src="attach/browserify-logo.png" class="logo" style="width:320px;margin-bottom:-40px" />
+
+                        > *require('modules') in the browser by bundling up all of your dependencies*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        #### Install
+
+                        ```
+                        $ npm install -g browserify
+                        ```
+
+                        ### *Actually you need do nothing but write CommomJS code!*
+                        <!-- .element: class="fragment" -->
+
+                        ```
+                        # magic just happen!
+                        $ browserify main.js -o bundle.js
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        #### *Demo Time*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        #### A Little Low-Level
+
+                        *Browserify parses the AST for require() calls to traverse the entire dependency graph of your project.*
+
+                        ### [AST: Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
+                        <!-- .element: class="fragment" -->
+
+                        <img src="attach/ast.png" class="logo fragment" style="width:320px;" />
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [Webpack](http://webpack.github.io/) - Module Bundler
+
+                        (2014)
+
+                        <img src="attach/webpack-icon.png" class="logo" style="width:320px;margin-bottom:-60px" />
+
+                        > *transforming, bundling, or packaging just about any resource or asset*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第七日 王者归来
+
+                        # *ES6 Module*
+
+                        最后的战役
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        # *Web is evolving*
+
+                        <ul>
+                            <li class="fragment"> Web sites are turning into Web apps </li>
+                            <li class="fragment"> Code complexity grows as the site gets bigger </li>
+                            <li class="fragment"> Highly decoupled JS files/modules is wanted</li>
+                            <li class="fragment"> Deployment wants optimized code in just one or a few HTTP calls</li>
+                        </ul>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### There is no module in JavaScript!
+
+                        <p class="fragment"> (until the ES6) </p>
+                    </script>
+                </section>
+
+
+
+
+
+
+                <section>
+                    <section data-background="#dddddd">
+                        <h2>Slide Backgrounds</h2>
+                        <p>
+                            Set <code>data-background="#dddddd"</code> on a slide to change the background color. All CSS color formats are supported.
+                        </p>
+                        <a href="#" class="navigate-down">
+                            <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
+                        </a>
+                    </section>
+                    <section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png">
+                        <h2>Image Backgrounds</h2>
+                        <pre><code>&lt;section data-background="image.png"&gt;</code></pre>
+                    </section>
+                    <section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png" data-background-repeat="repeat" data-background-size="100px">
+                        <h2>Tiled Backgrounds</h2>
+                        <pre><code style="word-wrap: break-word;">&lt;section data-background="image.png" data-background-repeat="repeat" data-background-size="100px"&gt;</code></pre>
+                    </section>
+                    <section data-background-video="https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.mp4,https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.webm" data-background-color="#000000">
+                        <div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
+                            <h2>Video Backgrounds</h2>
+                            <pre><code style="word-wrap: break-word;">&lt;section data-background-video="video.mp4,video.webm"&gt;</code></pre>
+                        </div>
+                    </section>
+                    <section data-background="http://i.giphy.com/90F8aUepslB84.gif">
+                        <h2>... and GIFs!</h2>
+                    </section>
+                </section>
+
+                <section data-transition="slide" data-background="#4d7e65" data-background-transition="zoom">
+                    <h2>Background Transitions</h2>
+                    <p>
+                        Different background transitions are available via the backgroundTransition option. This one's called "zoom".
+                    </p>
+                    <pre><code>Reveal.configure({ backgroundTransition: 'zoom' })</code></pre>
+                </section>
+
+                <section data-transition="slide" data-background="#b5533c" data-background-transition="zoom">
+                    <h2>Background Transitions</h2>
+                    <p>
+                        You can override background transitions per-slide.
+                    </p>
+                    <pre><code style="word-wrap: break-word;">&lt;section data-background-transition="zoom"&gt;</code></pre>
+                </section>
+
+                <section>
+                    <h2>Pretty Code</h2>
+                    <pre><code data-trim contenteditable>
+alert("Hello World");
+                    </code></pre>
+                    <button onclick="alert('Hello World')"> Click me to exec </button>
+                    <p>Code syntax highlighting courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
+                </section>
+
+                <section>
+                    <h2>Marvelous List</h2>
+                    <ul>
+                        <li>No order here</li>
+                        <li>Or here</li>
+                        <li>Or here</li>
+                        <li>Or here</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Fantastic Ordered List</h2>
+                    <ol>
+                        <li>One is smaller than...</li>
+                        <li>Two is smaller than...</li>
+                        <li>Three!</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h2>Tabular Tables</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Value</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Apples</td>
+                                <td>$1</td>
+                                <td>7</td>
+                            </tr>
+                            <tr>
+                                <td>Lemonade</td>
+                                <td>$2</td>
+                                <td>18</td>
+                            </tr>
+                            <tr>
+                                <td>Bread</td>
+                                <td>$3</td>
+                                <td>2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+
+                <section>
+                    <h2>Clever Quotes</h2>
+                    <p>
+                        These guys come in two forms, inline: <q cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
+                        &ldquo;The nice thing about standards is that there are so many to choose from&rdquo;</q> and block:
+                    </p>
+                    <blockquote cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
+                        &ldquo;For years there has been a theory that millions of monkeys typing at random on millions of typewriters would
+                        reproduce the entire works of Shakespeare. The Internet has proven this theory to be untrue.&rdquo;
+                    </blockquote>
+                </section>
+
+
+
+                <section style="text-align: left;">
+                    <h1>THE END</h1>
+                    <p>
+                        - <a href="http://slides.com">Try the online editor</a> <br>
+                        - <a href="https://github.com/hakimel/reveal.js">Source code &amp; documentation</a>
+                    </p>
+                </section>
+
+            </div>
+
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+
+        </script>
+        <script type="text/javascript">
+            function codeEditor(){
+                var nodes = document.querySelectorAll("code");
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].setAttribute("contenteditable", '');
+                }
+                console.log('code editable now.');
+            }
+            window.codeEditor = codeEditor;
+
+            document.addEventListener('DOMContentLoaded', function(){
+                setTimeout(function(){
+                    codeEditor();
+                },1000)
+            })
+        </script>
+    </body>
+</html>
