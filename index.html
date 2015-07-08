@@ -71,6 +71,30 @@
                         </small>
                     </script>
                 </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### Why Modular?
+
+                        # *Web is evolving*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <img src="attach/joke/javascript.jpg" style="width:360px;" />
+
+                        - Web sites are turning into *Web Apps*
+
+                        - Code *complexity* grows as the site gets bigger
+
+                        - Highly *decoupled* JS files/modules is wanted
+
+                        - *Deployment* wants optimized code in few HTTP calls
+                    </script>
+                </section>
+                
 <!-- 第一日 --->
                 <section data-markdown>
                     <script type="text/template">
@@ -458,8 +482,8 @@
                 </section>
 
                 <section data-markdown>
-                    <script type="text/template">
-                        Code Optimize Tool
+                    <script type="text/template" >
+                        <img src="attach/joke/3.jpg" height="300px" width="300px" />
 
                         - 合并 *Concat*
 
@@ -844,14 +868,106 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        ### *RequireJS 配置与实践*
+                        *RequireJS 最佳实践*
 
-                        - baseUrl
-                        - parhs & moduleID
-                        - shim
-                        - opimized build & r.js
+                        ### Use Case
 
+                        ```javascript
+                        require([
+                            'React',    // ModuleID
+                            'IScroll',
+                            'FastClick'
+                            'navBar',
+                            'tabBar',
+                        ], function(
+                            React,      // Export
+                            IScroll
+                            FastClick
+                            NavBar,
+                            TabBar,
+                        ) {
+                        ```
+                    </script>
+                </section>
 
+                <section data-markdown>
+                    <script type="text/template">
+                        *RequireJS 最佳实践*
+
+                        ### Config
+
+                        ```javascript
+                        require.config({
+                            // 查找根路径，当加载包含协议或以/开头、.js结尾的文件时不启用
+                            baseUrl: "./js",
+                            // 配置 ModuleID 与 路径 的映射
+                            paths: {
+                                React: "lib/react-with-addons",
+                                FastClick: "http://cdn.bootcss.com/fastclick/1.0.3/fastclick.min",
+                                IScroll: "lib/iscroll",
+                            },
+                            // 为那些“全局变量注入”型脚本做依赖和导出配置
+                            shim: {
+                                'IScroll': {
+                                    exports: "IScroll"
+                                },
+                            },
+                            // 从 CommonJS 包中加载模块
+                            packages: [
+                                {
+                                    name: "ReactChart",
+                                    location: "lib/react-chart",
+                                    main: "index"
+                                }
+                            ]
+                        })
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *RequireJS 最佳实践*
+
+                        ### Optimized Build
+
+                        ```bash
+                        node r.js -o build.js
+                        ```
+                        ```javascript
+                        // build.js
+                        ({
+                            appDir: './src',
+                            baseUrl: './js',
+                            dir: './dist',
+                            modules: [
+                                {
+                                    name: 'app'
+                                }
+                            ],
+                            fileExclusionRegExp: /^(r|build)\.js$/,
+                            optimizeCss: 'standard',
+                            removeCombined: true,
+                            paths: {
+                                React : "lib/react-with-addons",
+                                FastClick: "http://cdn.bootcss.com/fastclick/1.0.3/fastclick.min",
+                                IScroll: "lib/iscroll"
+                            },
+                            shim: {
+                                'IScroll': {
+                                    exports: "IScroll"
+                                },
+                            },
+                            packages: [
+                                {
+                                    name: "ReactChart",
+                                    location: "lib/react-chart",
+                                    main: "index"
+                                }
+                            ]
+                        })
+                        // 简单的说，就是要把所有配置 repeat 一遍
+                        ```
                     </script>
                 </section>
 
@@ -863,6 +979,17 @@
                         # *Browserify/Webpack*
 
                         大势所趋，去掉这层包裹！
+                    </script>
+                </section>
+
+                <section data-markdown data-background="attach/npm.png"
+                    style="background: rgba(0,0,0,0.7)"
+                >
+                    <script type="text/template">
+                        # *[NPM](https://www.npmjs.com/)*
+                        Node Package Manger
+
+                        *Browsers don't have the require method defined, <br>but Node.js does.*
                     </script>
                 </section>
 
@@ -885,12 +1012,11 @@
                         ```
                         $ npm install -g browserify
                         ```
-
                         ### *Actually you need do nothing but write CommomJS code!*
                         <!-- .element: class="fragment" -->
 
                         ```
-                        # magic just happen!
+                        # magic just happened!
                         $ browserify main.js -o bundle.js
                         ```
                         <!-- .element: class="fragment" -->
@@ -915,6 +1041,69 @@
 
                 <section data-markdown>
                     <script type="text/template">
+                        每一次改动都需要手动 recompile ？
+
+                        No, auto-recompile.
+
+                        ## *Watch - [Watchify](https://www.npmjs.com/package/watchify)*
+                        <!-- .element: class="fragment" -->
+
+                        ```
+                        $ npm install -g watchify
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        ```
+                        # WATCH!
+                        $ watchify app.js -o bundle.js -v
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        Build 后要如何 Debug
+
+                        ## *Source Map*
+                        <!-- .element: class="fragment" -->
+
+                        ```bash
+                        # debug mode
+                        $ browserify main.js -o bundle.js --debug
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        *逆向所有合并、压缩、混淆！*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## *`npm run`*
+
+                        ```
+                        $ npm run [command] [-- <args>]
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        ```javascript
+                        // package.json
+                        {
+                            //....
+                            "scripts": {
+                                "build": "browserify app.js -o bundle.js",
+                                "watch": "watchify app.js -o bundle.js -v"
+                            }
+                        }
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
                         ## [Webpack](http://webpack.github.io/) - Module Bundler
 
                         (2014)
@@ -922,6 +1111,96 @@
                         <img src="attach/webpack-icon.png" class="logo" style="width:320px;margin-bottom:-60px" />
 
                         > *transforming, bundling, or packaging just about any resource or asset*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Motivation*
+
+                        - Compatibility（CommonJS, AMD, ES6...）
+
+                        - Code Splitting
+
+                        - Loader/Transform
+
+                        - Replace grunt or gulp
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Overview*
+
+                        ```bash
+                        webpack main.js bundle.js
+                        ```
+
+                        ```javascript
+                        // webpack.config.js
+                        module.exports = {
+                            entry: "./main.js",
+                            output: {
+                                filename: "bundle.js"
+                            }
+                        }
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Simple CLI*
+
+                        ```bash
+                        # Development: debug + devtool + source-map + pathinfo
+                        webpack main.js bundle.js -d
+
+                        # Production: minimize + occurence-order
+                        webpack main.js bundle.js -p
+
+                        # Watch Mode
+                        webpack main.js bundle.js --watch
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Compile-to-JS Loader*
+
+                        ```javascript
+                        // webpack.config.js
+                        module.exports = {
+                            entry: './main.js',
+                            output: {
+                                filename: 'bundle.js'
+                            }{,
+                            module: {
+                                loaders: [
+                                    { test: /\.js$/, laoder: 'jsx-loader?harmony'}
+                                ]
+                            }}
+                        }
+                        ```
+
+                        ***JSX Demo***
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *Browserify vs Webpack*
+
+                        ### 小而美. VS 大而全.
+
+                        <br>
+
+                        - [Comparison - Webpack](http://webpack.github.io/docs/comparison.html)
+                        - [Webpack for browserify users](http://webpack.github.io/docs/webpack-for-browserify-users.html)
+                        - [Browserify for webpack users](https://gist.github.com/substack/68f8d502be42d5cd4942)
+                        - [Browserify VS Webpack - JS Drama](http://blog.namangoel.com/browserify-vs-webpack-js-drama)
                     </script>
                 </section>
 
@@ -937,146 +1216,139 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        # *Web is evolving*
+                        ### There is no module in JavaScript!
 
-                        <ul>
-                            <li class="fragment"> Web sites are turning into Web apps </li>
-                            <li class="fragment"> Code complexity grows as the site gets bigger </li>
-                            <li class="fragment"> Highly decoupled JS files/modules is wanted</li>
-                            <li class="fragment"> Deployment wants optimized code in just one or a few HTTP calls</li>
-                        </ul>
+                        <p class="fragment"> (Until *ECMAScript 6*) </p>
+                        <!-- .element: class="fragment" -->
+
+                        ### Well...But there is no runtime...
+                        <!-- .element: class="fragment" -->
                     </script>
                 </section>
 
                 <section data-markdown>
                     <script type="text/template">
-                        ### There is no module in JavaScript!
+                        ## [Babel](https://babeljs.io/) - JavaScript Compiler
 
-                        <p class="fragment"> (until the ES6) </p>
+                        (2015)
+
+                        <img src="attach/babel-logo.png" class="logo" style="width:300px;margin:0;margin-bottom:-50px" />
+
+                        > *Use next generation JavaScript, today.*
                     </script>
                 </section>
 
+                <section data-markdown>
+                    <script type="text/template">
+                        Let's get into it!!
 
+                        ### *Overview*
 
+                        ```dart
+                        // util.js
+                        export function getRandom() {
+                            return Math.random();
+                        }
+                        ```
+                        ```dart
+                        // app.js
+                        import { getRandom } from "./util";
+                        console.log(getRandom());
+                        ```
 
-
-
-                <section>
-                    <section data-background="#dddddd">
-                        <h2>Slide Backgrounds</h2>
-                        <p>
-                            Set <code>data-background="#dddddd"</code> on a slide to change the background color. All CSS color formats are supported.
-                        </p>
-                        <a href="#" class="navigate-down">
-                            <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-                        </a>
-                    </section>
-                    <section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png">
-                        <h2>Image Backgrounds</h2>
-                        <pre><code>&lt;section data-background="image.png"&gt;</code></pre>
-                    </section>
-                    <section data-background="https://s3.amazonaws.com/hakim-static/reveal-js/image-placeholder.png" data-background-repeat="repeat" data-background-size="100px">
-                        <h2>Tiled Backgrounds</h2>
-                        <pre><code style="word-wrap: break-word;">&lt;section data-background="image.png" data-background-repeat="repeat" data-background-size="100px"&gt;</code></pre>
-                    </section>
-                    <section data-background-video="https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.mp4,https://s3.amazonaws.com/static.slid.es/site/homepage/v1/homepage-video-editor.webm" data-background-color="#000000">
-                        <div style="background-color: rgba(0, 0, 0, 0.9); color: #fff; padding: 20px;">
-                            <h2>Video Backgrounds</h2>
-                            <pre><code style="word-wrap: break-word;">&lt;section data-background-video="video.mp4,video.webm"&gt;</code></pre>
-                        </div>
-                    </section>
-                    <section data-background="http://i.giphy.com/90F8aUepslB84.gif">
-                        <h2>... and GIFs!</h2>
-                    </section>
+                        ```
+                        # babel magic!
+                        $ babel-node app.js
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
                 </section>
 
-                <section data-transition="slide" data-background="#4d7e65" data-background-transition="zoom">
-                    <h2>Background Transitions</h2>
-                    <p>
-                        Different background transitions are available via the backgroundTransition option. This one's called "zoom".
-                    </p>
-                    <pre><code>Reveal.configure({ backgroundTransition: 'zoom' })</code></pre>
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Export Members*
+
+                        ```dart
+                        // export Declaration
+                        export function foo(){
+                            console.log('I am not bar.');
+                        }
+                        ```
+                        ```dart
+                        // export VariableStatement;
+                        export var PI = 3.14;
+                        export var bar = foo;   // function expression
+                        ```
+                        ```dart
+                        // export { ExportsList }
+                        var PI = 3.14;
+                        var foo = function(){};
+
+                        export { PI, foo };
+                        ```
+                    </script>
                 </section>
 
-                <section data-transition="slide" data-background="#b5533c" data-background-transition="zoom">
-                    <h2>Background Transitions</h2>
-                    <p>
-                        You can override background transitions per-slide.
-                    </p>
-                    <pre><code style="word-wrap: break-word;">&lt;section data-background-transition="zoom"&gt;</code></pre>
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Import Members*
+
+                        [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)
+
+                        ```dart
+                        // import { ImportsList } from "module-name"
+                        import { PI } from "./math";
+                        import { PI, foo } from "module-name";
+                        ```
+                        ```dart
+                        // import IdentifierName as ImportedBinding
+                        import { foo as bar } from "./math";
+                        bar();  // use alias bar
+                        ```
+                        ```dart
+                        // import NameSpaceImport
+                        import * as math from "./math";
+                        math.PI
+                        math.foo()
+                        ```
+                    </script>
                 </section>
 
-                <section>
-                    <h2>Pretty Code</h2>
-                    <pre><code data-trim contenteditable>
-alert("Hello World");
-                    </code></pre>
-                    <button onclick="alert('Hello World')"> Click me to exec </button>
-                    <p>Code syntax highlighting courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Single Module Pattern*
+
+                        [Airbnb JavaScript Style](https://github.com/airbnb/javascript#modules)
+
+                        ```dart
+                        // math.js
+                        var math = {
+                            PI: 3.14,
+                            foo: function(){}
+                        }
+                        export default math;
+                        ```
+                        ```dart
+                        // main.js
+                        import math from "./math";
+                        math.PI
+                        math.foo()
+                        ```
+                    </script>
                 </section>
 
-                <section>
-                    <h2>Marvelous List</h2>
-                    <ul>
-                        <li>No order here</li>
-                        <li>Or here</li>
-                        <li>Or here</li>
-                        <li>Or here</li>
-                    </ul>
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *For more detail...*
+
+                        ## [ECMA-262/6.0/#Exports](http://www.ecma-international.org/ecma-262/6.0/#sec-exports)
+                        ## [ECMA-262/6.0/#Imports](http://www.ecma-international.org/ecma-262/6.0/#sec-imports)
+
+                        <span style="font-size:55px">“ </span>
+                        <small style="vertical-align:text-top"> 其实这破语法还是挺晦涩的 (´Д` ) ”</small>
+                        <span style="padding-left:22px"></span>
+                    </script>
                 </section>
-
-                <section>
-                    <h2>Fantastic Ordered List</h2>
-                    <ol>
-                        <li>One is smaller than...</li>
-                        <li>Two is smaller than...</li>
-                        <li>Three!</li>
-                    </ol>
-                </section>
-
-                <section>
-                    <h2>Tabular Tables</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Value</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Apples</td>
-                                <td>$1</td>
-                                <td>7</td>
-                            </tr>
-                            <tr>
-                                <td>Lemonade</td>
-                                <td>$2</td>
-                                <td>18</td>
-                            </tr>
-                            <tr>
-                                <td>Bread</td>
-                                <td>$3</td>
-                                <td>2</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
-
-                <section>
-                    <h2>Clever Quotes</h2>
-                    <p>
-                        These guys come in two forms, inline: <q cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-                        &ldquo;The nice thing about standards is that there are so many to choose from&rdquo;</q> and block:
-                    </p>
-                    <blockquote cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-                        &ldquo;For years there has been a theory that millions of monkeys typing at random on millions of typewriters would
-                        reproduce the entire works of Shakespeare. The Internet has proven this theory to be untrue.&rdquo;
-                    </blockquote>
-                </section>
-
-
 
                 <section style="text-align: left;">
                     <h1>THE END</h1>
@@ -1085,9 +1357,7 @@ alert("Hello World");
                         - <a href="https://github.com/hakimel/reveal.js">Source code &amp; documentation</a>
                     </p>
                 </section>
-
             </div>
-
         </div>
 
         <script src="lib/js/head.min.js"></script>
