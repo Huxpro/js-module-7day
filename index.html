@@ -83,7 +83,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        <img src="attach/joke/javascript.jpg" style="width:360px;" />
+                        <img src="attach/joke/js.jpg" style="width:360px;" />
 
                         - Web sites are turning into *Web Apps*
 
@@ -94,7 +94,7 @@
                         - *Deployment* wants optimized code in few HTTP calls
                     </script>
                 </section>
-                
+
 <!-- 第一日 --->
                 <section data-markdown>
                     <script type="text/template">
@@ -1300,11 +1300,13 @@
                         import { PI } from "./math";
                         import { PI, foo } from "module-name";
                         ```
+
                         ```dart
                         // import IdentifierName as ImportedBinding
                         import { foo as bar } from "./math";
                         bar();  // use alias bar
                         ```
+
                         ```dart
                         // import NameSpaceImport
                         import * as math from "./math";
@@ -1328,6 +1330,7 @@
                         }
                         export default math;
                         ```
+
                         ```dart
                         // main.js
                         import math from "./math";
@@ -1350,15 +1353,34 @@
                     </script>
                 </section>
 
+                <section data-markdown>
+                    <script type="text/template">
+                        <img src="attach/qrcode.png" style="
+                            box-shadow: 2px 2px 23px 1px rgba(0, 0, 0, 0.68);
+                            width: 350px;
+                            height: 350px;
+                        " />
+
+                        #### [huangxuan.me/js-module-7day](http://huangxuan.me/js-module-7day/#/)
+
+                    </script>
+                </section>
+
                 <section style="text-align: left;">
                     <h1>THE END</h1>
-                    <p>
-                        - <a href="http://slides.com">Try the online editor</a> <br>
-                        - <a href="https://github.com/hakimel/reveal.js">Source code &amp; documentation</a>
-                    </p>
+
+                    <h5>黄玄</h5>
+                    <small>
+                        <a href="http://huangxuan.me">Blog</a> /
+                        <a href="http://weibo.com/huxpro">@Huxpro</a> /
+                        <a href="https://github.com/huxpro">GitHub</a> /
+                        <a href="http://www.zhihu.com/people/huxpro">知乎</a>
+                    </small>
                 </section>
             </div>
         </div>
+
+        <pre style="display:none"><code> force highlight.js work </code></pre>
 
         <script src="lib/js/head.min.js"></script>
         <script src="js/reveal.js"></script>
@@ -1372,7 +1394,6 @@
                 progress: true,
                 history: true,
                 center: true,
-
                 transition: 'slide', // none/fade/slide/convex/concave/zoom
 
                 // Optional reveal.js plugins
@@ -1380,13 +1401,14 @@
                     { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
                     { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
                     { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-                    { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/highlight/highlight.js', condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
                     { src: 'plugin/zoom-js/zoom.js', async: true },
                     { src: 'plugin/notes/notes.js', async: true }
                 ]
             });
 
         </script>
+
         <script type="text/javascript">
             function codeEditor(){
                 var nodes = document.querySelectorAll("code");
