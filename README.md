@@ -1,10 +1,12 @@
 # JavaScript Modularization *Seven Day*
 
+## JavaScript 模块化*七日谈*
+
 ### [Watch Slides → ](http://huangxuan.me/js-module-7day)
 
 ![qrcode](http://huangxuan.me/js-module-7day/attach/qrcode.png)
 
-### JavaScript 模块化 *七日谈*
+### Catalog
 
 - 第一日 上古时期 ***Module?*** 从设计模式说起
 - 第二日 石器时代 ***Script Loader*** 只有封装性可不够，我们还需要加载
