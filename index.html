@@ -875,10 +875,10 @@
 
                         ```javascript
                         require([
-                            'React',    // ModuleID
+                            'React',    // 尽量使用 ModuleID
                             'IScroll',
                             'FastClick'
-                            'navBar',
+                            'navBar',   // 和同目录下的 js 文件
                             'tabBar',
                         ], function(
                             React,      // Export
@@ -937,6 +937,7 @@
                         ```
                         ```javascript
                         // build.js
+                        // 简单的说，要把所有配置 repeat 一遍
                         ({
                             appDir: './src',
                             baseUrl: './js',
@@ -967,7 +968,6 @@
                                 }
                             ]
                         })
-                        // 简单的说，就是要把所有配置 repeat 一遍
                         ```
                     </script>
                 </section>

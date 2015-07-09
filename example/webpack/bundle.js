@@ -51,7 +51,7 @@
 	var Hello = React.createClass({displayName: "Hello",
 	    render: function(){
 	        return (
-	            React.createElement("div", null, " Hello Webpack & React! ")
+	            React.createElement("div", null, "  Watch Webpack & React! ")
 	        )
 	    }
 	})

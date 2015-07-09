@@ -5,4 +5,4 @@ var math = {
     }
 }
 
-export default math;
+export default Math;

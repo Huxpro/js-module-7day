@@ -1,9 +1,10 @@
 // app.js
 
-import * as math from "./math";
+import {PI} from "./math";
 
-console.log(math.sum(math.PI, math.PI));
+console.log(PI);
+//console.log(math.sum(math.PI, math.PI));
 
-import { getRandom } from "./util";
+//import { getRandom } from "./util";
 
-console.log(getRandom())
+//console.log(getRandom())
