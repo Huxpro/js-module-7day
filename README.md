@@ -1,6 +1,8 @@
 # JavaScript Modularization *Seven Day*
 
-### [Watch Slides](http://huangxuan.me/js-module-7day)
+### [Watch Slides → ](http://huangxuan.me/js-module-7day)
+
+![qrcode](http://huangxuan.me/js-module-7day/attach/qrcode.png)
 
 ### JavaScript 模块化 *七日谈*
 
