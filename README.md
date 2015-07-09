@@ -1,5 +1,7 @@
 # JavaScript Modularization *Seven Day*
 
+[Watch Slides](http://huangxuan.me/js-module-7day)
+
 ### JavaScript 模块化 *七日谈*
 
 - 第一日 上古时期 ***Module?*** 从设计模式说起
