@@ -4,7 +4,7 @@
 
 ### [Watch Slides → ](http://huangxuan.me/js-module-7day)
 
-![qrcode](http://huangxuan.me/js-module-7day/attach/qrcode.png)
+<img src="http://huangxuan.me/js-module-7day/attach/qrcode.png" width="350" />
 
 ### Catalog
 
