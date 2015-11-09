@@ -1,6 +1,6 @@
-# JavaScript Modularization *Seven Day*
+# JavaScript Modularization *Journey*
 
-## JavaScript 模块化*七日谈*
+### ( JavaScript 模块化*七日谈 )*
 
 ### [Watch Slides → ](http://huangxuan.me/js-module-7day)
 

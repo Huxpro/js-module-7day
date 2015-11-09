@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
 
-        <title>JavaScript Modularization Seven Day</title>
+        <title>JavaScript Modularization Journey</title>
 
         <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
         <meta name="author" content="Hakim El Hattab">
@@ -35,7 +35,7 @@
     </head>
 
     <body>
-
+    
         <div class="reveal">
 
             <!-- Any section element inside of this container is displayed as a slide -->
@@ -43,7 +43,7 @@
 
                 <section style="margin-top:2%" data-markdown>
                     <script type="text/template">
-                        # JavaScript Modularization *Seven Day*
+                        # JavaScript Modularization *Journey*
                         ### JavaScript 模块化*七日谈*
 
                         <small>
@@ -154,7 +154,7 @@
                         var Module = (function(){
                             var _private = "safe now";
                             var foo = function(){
-                                console.log("Foo")
+                                console.log(_private)
                             }
 
                             return {
@@ -177,11 +177,12 @@
 
                         ```javascript
                         var Module = (function($){
+                            var _$body = $("body");     // we can use jQuery now!
                             var foo = function(){
-                                console.log("wow, I can use jQuery now");
-                                console.info($);
+                                console.log(_$body);    // 特权方法
                             }
 
+                            // Revelation Pattern
                             return {
                                 foo: foo
                             }
@@ -455,7 +456,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        How Combo Work
+                        How Combo Works
 
                         ```jade
                         script(src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js")
@@ -570,7 +571,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        #### Sync Load
+                        #### Synchronously
 
                         ```javascript
                         // timeout.js
@@ -698,7 +699,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        ***Function Wrapping***
+                        ### *Function Wrapping*
 
                         ```
                         //AMD Wrapper
@@ -870,6 +871,12 @@
                 <section data-markdown>
                     <script type="text/template">
                         *RequireJS 最佳实践*
+                        <small style="
+                            vertical-align: baseline;
+                            margin-left: 10px;
+                        ">
+                            <a href="#/47">跳过</a>
+                        </small>
 
                         ### Use Case
 
@@ -1008,7 +1015,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        #### Install
+                        Install
 
                         ```
                         $ npm install -g browserify
@@ -1029,7 +1036,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        #### A Little Low-Level
+                        A Little Low-Level
 
                         *Browserify parses the AST for require() calls to traverse the entire dependency graph of your project.*
 
@@ -1115,30 +1122,21 @@
                     </script>
                 </section>
 
-                <section data-markdown>
-                    <script type="text/template">
-                        ### *Motivation*
 
-                        - Compatibility（CommonJS, AMD, ES6...）
-
-                        - Code Splitting
-
-                        - Loader/Transform
-
-                        - Replace grunt or gulp
-                    </script>
-                </section>
 
                 <section data-markdown>
                     <script type="text/template">
-                        ### *Overview*
+                        Webpack For Browserify Users
 
                         ```bash
-                        webpack main.js bundle.js
+                        # These are equivalent:
+                        $ browserify main.js > bundle.js
+                        $ webpack main.js bundle.js
                         ```
 
+                        *BUT*
                         ```javascript
-                        // webpack.config.js
+                        // better with a webpack.config.js
                         module.exports = {
                             entry: "./main.js",
                             output: {
@@ -1151,9 +1149,11 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        ### *Simple CLI*
+                        ### *Simple [CLI](http://webpack.github.io/docs/cli.html)*
 
                         ```bash
+                        # make sure your directory contains webpack.config.js
+
                         # Development: debug + devtool + source-map + pathinfo
                         webpack main.js bundle.js -d
 
@@ -1163,12 +1163,66 @@
                         # Watch Mode
                         webpack main.js bundle.js --watch
                         ```
+
+                        Everything is already there!
                     </script>
                 </section>
 
                 <section data-markdown>
                     <script type="text/template">
-                        ### *Compile-to-JS Loader*
+                        *Browserify vs Webpack*
+
+                        ## 小而美 VS 大而全
+
+                        <br>
+
+                        - [Browserify VS Webpack - JS Drama](http://blog.namangoel.com/browserify-vs-webpack-js-drama)
+                        - [Comparison - Webpack](http://webpack.github.io/docs/comparison.html)
+                        - [Webpack for browserify users](http://webpack.github.io/docs/webpack-for-browserify-users.html)
+                        - [Browserify for webpack users](https://gist.github.com/substack/68f8d502be42d5cd4942)
+
+                    </script>
+                </section>
+
+                <style>
+                    .bloom{
+                        transform: scale(0);
+                        transition: transform 0.7s cubic-bezier(0.68, 0.04, 0.49, 0.95);
+                    }
+                    .present .bloom{
+                        transform: scale(1);
+                    }
+                </style>
+                <section data-markdown>
+                    <script type="text/template">
+                        <div class="bloom">
+                            Is webpack just the other Browserify?
+                            <div>
+                                <h1>Webpack - *Like a pro* </h1>
+                                <p>webpack *特别增强篇*</p>
+                            </div>
+                            <img src="attach/webpack-icon.png" class="logo" width="220" />
+                        </div>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [Motivation](http://webpack.github.io/docs/motivation.html)
+
+                        - Compatibility (CommonJS, AMD, ES6...)
+
+                        - Code Splitting
+
+                        - Loaders & Plugins
+
+                        - Development Tools & Workflow
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *[Using Loaders](http://webpack.github.io/docs/using-loaders.html)*
 
                         ```javascript
                         // webpack.config.js
@@ -1178,9 +1232,10 @@
                                 filename: 'bundle.js'
                             }{,
                             module: {
-                                loaders: [
-                                    { test: /\.js$/, laoder: 'jsx-loader?harmony'}
-                                ]
+                                loaders: [{
+                                    test: /\.js$/,
+                                    loader: 'babel-loader'
+                                }]
                             }}
                         }
                         ```
@@ -1192,16 +1247,130 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        *Browserify vs Webpack*
+                        ## *[Why only JavaScript?](http://webpack.github.io/docs/motivation.html#why-only-javascript)*
 
-                        ### 小而美. VS 大而全.
+                        > There are many other *static resources* that need to be handled
+                    </script>
+                </section>
 
-                        <br>
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *require()* static resources!
 
-                        - [Comparison - Webpack](http://webpack.github.io/docs/comparison.html)
-                        - [Webpack for browserify users](http://webpack.github.io/docs/webpack-for-browserify-users.html)
-                        - [Browserify for webpack users](https://gist.github.com/substack/68f8d502be42d5cd4942)
-                        - [Browserify VS Webpack - JS Drama](http://blog.namangoel.com/browserify-vs-webpack-js-drama)
+                        ```javascript
+                        // Ensure the stylesheet is loaded
+                        require('./bootstrap.css');
+
+                        // get a URL or DataURI
+                        var myImage = document.createElement('img');
+                        myImage.src = require('./myImage.jpg');
+                        ```
+
+                        <blockquote class="fragment">
+                            <p>They are part of *dependency graph*</p>
+                        </blockquote>
+
+                        *包含静态资源的依赖管理*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *require()* anything!
+
+                        ```javascript
+                        // CSS Preprocesser
+                        require('./style.less');
+                        require('./anotherStyle.scss');
+
+                        // Compile-to-JS Language
+                        var myModule = require('./myModule.coffee');
+                        var myTypedModule = require('./myTypedModule.ts');
+                        ```
+
+                        Universal Module System
+                        <!-- .element: class="fragment" -->
+
+                        *对所有模块一视同仁的的依赖管理*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Sass & Images*
+
+                        ```javascript
+                        var webpackConfig = {
+                            module: {
+                                loaders: [{
+                                    test: /\.scss$/,
+                                    loaders: 'style!css!sass'
+                                }, {
+                                    test: /\.(png|jpg|svg)$/,
+                                    loader: 'url?limit=20480' //20k
+                                }]
+                            }}
+                        }
+                        ```
+
+                        * Deal with CSS problems
+                        <!-- .element: class="fragment" -->
+
+                        * Inlining your images to DataURI
+                        <!-- .element: class="fragment" -->
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *[Using Plugins](http://webpack.github.io/docs/using-plugins.html)*
+
+                        ```javascript
+                        var config = {
+                            entry: ['webpack/hot/dev-server', './app/main.js'],
+                            module: {
+                                loaders: [{
+                                    test: /\.(js|jsx)$/,
+                                    loaders: ['react-hot', 'babel']
+                                }]
+                            },
+                            plugins: [
+                                //Enables Hot Modules Replacement
+                                new webpack.HotModuleReplacementPlugin(),
+                            ],
+                        };
+                        ```
+
+                        #### [React Hot Loader!](http://gaearon.github.io/react-hot-loader/)
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *[Code Splitting](http://webpack.github.io/docs/code-splitting.html)*
+
+                        > split your codebase into “chunks” which are loaded on demand.
+
+                        - [Optimizing Common Code](https://github.com/petehunt/webpack-howto#8-optimizing-common-code)
+                        <!-- .element: class="fragment" -->
+
+                        - [Async Loading ](https://github.com/petehunt/webpack-howto#9-async-loading)
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        More Resource
+
+                        ## [Webpack Howto (Pete Hunt)](https://github.com/petehunt/webpack-howto)
+                        ## [React Webpack Cookbook](http://christianalfoni.github.io/react-webpack-cookbook/index.html)
+
+
                     </script>
                 </section>
 
@@ -1243,18 +1412,20 @@
                     <script type="text/template">
                         Let's get into it!!
 
-                        ### *Overview*
+                        ### *Single Default Module*
 
                         ```dart
-                        // util.js
-                        export function getRandom() {
-                            return Math.random();
+                        // math.js
+                        export default math = {
+                            PI: 3.14,
+                            foo: function(){}
                         }
                         ```
+
                         ```dart
                         // app.js
-                        import { getRandom } from "./util";
-                        console.log(getRandom());
+                        import math from "./math";
+                        math.PI
                         ```
 
                         ```
@@ -1262,6 +1433,30 @@
                         $ babel-node app.js
                         ```
                         <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *With ES6 Destructuring*
+
+                        ```dart
+                        // components.js
+                        import Button from './Button';
+                        import Header from './Header';
+
+                        // use property value shorthand
+                        export {
+                            Button,
+                            Header
+                        }
+                        ```
+                        ```dart
+                        // app.js
+                        import { Button, Header } from "./components";
+                        ```
+
+                        *Sooooo Awesome!*
                     </script>
                 </section>
 
@@ -1294,8 +1489,6 @@
                     <script type="text/template">
                         ### *Import Members*
 
-                        [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)
-
                         ```dart
                         // import { ImportsList } from "module-name"
                         import { PI } from "./math";
@@ -1314,30 +1507,9 @@
                         math.PI
                         math.foo()
                         ```
-                    </script>
-                </section>
 
-                <section data-markdown>
-                    <script type="text/template">
-                        ### *Single Module Pattern*
-
-                        [Airbnb JavaScript Style](https://github.com/airbnb/javascript#modules)
-
-                        ```dart
-                        // math.js
-                        var math = {
-                            PI: 3.14,
-                            foo: function(){}
-                        }
-                        export default math;
-                        ```
-
-                        ```dart
-                        // main.js
-                        import math from "./math";
-                        math.PI
-                        math.foo()
-                        ```
+                        *[Airbnb JavaScript Style Guide - Modules](https://github.com/airbnb/javascript#modules)*
+                        <!-- .element: class="fragment" -->
                     </script>
                 </section>
 
@@ -1349,8 +1521,44 @@
                         ## [ECMA-262/6.0/#Imports](http://www.ecma-international.org/ecma-262/6.0/#sec-imports)
 
                         <span style="font-size:55px">“ </span>
-                        <small style="vertical-align:text-top"> 其实这破语法还是挺晦涩的 (´Д` ) ”</small>
+                        <small style="vertical-align:text-top"> 习惯了就会觉得很好用的 (´Д` ) ”</small>
                         <span style="padding-left:22px"></span>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <div style="
+                            position: relative;
+                            margin-left: -300px;">
+                            <img src="attach/babel-logo.png" class="logo" style="width:300px;margin:0;margin-bottom:-35px" />
+                            <h1>*×*</h1>
+                            <h2 style="
+                                position: absolute;
+                                right: 150px;
+                                top:134px;
+                                font-style: italic;
+                            ">[= babelify](https://github.com/babel/babelify)</h2>
+                            <img src="attach/browserify-logo.png" class="logo" style="width:400px;margin-top:-70px" />
+                        </div>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <div style="
+                            position: relative;
+                            margin-left: -300px;">
+                            <img src="attach/babel-logo.png" class="logo" style="width:300px;margin:0;margin-bottom:-35px" />
+                            <h1>*×*</h1>
+                            <h2 style="
+                                position: absolute;
+                                right: 100px;
+                                top:134px;
+                                font-style: italic;
+                            ">[= babel-loader](https://github.com/babel/babel-loader)</h2>
+                            <img src="attach/webpack-icon.png" class="logo" style="width:380px;margin-top:-30px" />
+                        </div>
                     </script>
                 </section>
 
