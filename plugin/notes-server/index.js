@@ -1,37 +1,40 @@
+var http      = require('http');
 var express   = require('express');
 var fs        = require('fs');
 var io        = require('socket.io');
-var _         = require('underscore');
 var Mustache  = require('mustache');
 
-var app       = express.createServer();
+var app       = express();
 var staticDir = express.static;
+var server    = http.createServer(app);
 
-io            = io.listen(app);
+io = io(server);
 
 var opts = {
 	port :      1947,
 	baseDir :   __dirname + '/../../'
 };
 
-io.sockets.on( 'connection', function( socket ) {
+io.on( 'connection', function( socket ) {
 
-	socket.on( 'connect', function( data ) {
-		socket.broadcast.emit( 'connect', data );
+	socket.on( 'new-subscriber', function( data ) {
+		socket.broadcast.emit( 'new-subscriber', data );
 	});
 
 	socket.on( 'statechanged', function( data ) {
+		delete data.state.overview;
 		socket.broadcast.emit( 'statechanged', data );
+	});
+
+	socket.on( 'statechanged-speaker', function( data ) {
+		delete data.state.overview;
+		socket.broadcast.emit( 'statechanged-speaker', data );
 	});
 
 });
 
-app.configure( function() {
-
-	[ 'css', 'js', 'images', 'plugin', 'lib' ].forEach( function( dir ) {
-		app.use( '/' + dir, staticDir( opts.baseDir + dir ) );
-	});
-
+[ 'css', 'js', 'images', 'plugin', 'lib' ].forEach( function( dir ) {
+	app.use( '/' + dir, staticDir( opts.baseDir + dir ) );
 });
 
 app.get('/', function( req, res ) {
@@ -52,7 +55,7 @@ app.get( '/notes/:socketId', function( req, res ) {
 });
 
 // Actually listen
-app.listen( opts.port || null );
+server.listen( opts.port || null );
 
 var brown = '\033[33m',
 	green = '\033[32m',
@@ -62,5 +65,5 @@ var slidesLocation = 'http://localhost' + ( opts.port ? ( ':' + opts.port ) : ''
 
 console.log( brown + 'reveal.js - Speaker Notes' + reset );
 console.log( '1. Open the slides at ' + green + slidesLocation + reset );
-console.log( '2. Click on the link your JS console to go to the notes page' );
+console.log( '2. Click on the link in your JS console to go to the notes page' );
 console.log( '3. Advance through your slides and your notes will advance automatically' );
