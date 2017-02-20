@@ -4,13 +4,15 @@ var React = require("react");
 
 class HelloMessage extends React.Component {
     render() {
-        return <div> Hello {this.props.name} </div>
+        return <div> 
+            Hello {this.props.name}
+            With CommonsChunkPlugin, the vendor is now Entry Chunk.
+        </div>
     }
 }
 
-
 React.render(
-    <HelloMessage name="ES6" />,
+    <HelloMessage name="Webpack" />,
     document.body
 )
 

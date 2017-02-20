@@ -7,7 +7,8 @@ module.exports = {
         vendor: ['react']
     },
     output: {
-        filename: '[name].[chunkhash:4].js'
+        path: __dirname + '/dist', 
+        filename: '[name].js'
     },
     module: {
         loaders: [
@@ -17,8 +18,7 @@ module.exports = {
     plugins: [
         // magic
         new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor',
-            filename: 'vendor.[chunkhash:4].js'
+            name: 'vendor'
         })
     ]
 }

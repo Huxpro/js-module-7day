@@ -6,7 +6,8 @@ module.exports = {
         vendor: ['react']
     },
     output: {
-        filename: '[name].[chunkhash:4].js'
+        path: __dirname + "/dist",
+        filename: '[name].js'
     },
     module: {
         loaders: [
