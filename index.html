@@ -1440,31 +1440,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        ### *With ES6 Destructuring*
-
-                        ```dart
-                        // components.js
-                        import Button from './Button';
-                        import Header from './Header';
-
-                        // use property value shorthand
-                        export {
-                            Button,
-                            Header
-                        }
-                        ```
-                        ```dart
-                        // app.js
-                        import { Button, Header } from "./components";
-                        ```
-
-                        *Sooooo Awesome!*
-                    </script>
-                </section>
-
-                <section data-markdown>
-                    <script type="text/template">
-                        ### *Export Members*
+                        ### *Named Exports*
 
                         ```dart
                         // export Declaration
@@ -1489,7 +1465,7 @@
 
                 <section data-markdown>
                     <script type="text/template">
-                        ### *Import Members*
+                        ### *Importing Named Exports*
 
                         ```dart
                         // import { ImportsList } from "module-name"
@@ -1509,12 +1485,33 @@
                         math.PI
                         math.foo()
                         ```
-
-                        *[Airbnb JavaScript Style Guide - Modules](https://github.com/airbnb/javascript#modules)*
-                        <!-- .element: class="fragment" -->
                     </script>
                 </section>
+                
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *"Lists"*
 
+                        ```dart
+                        // components.js
+                        import Button from './Button';
+                        import Header from './Header';
+
+                        // export { ExportsList }
+                        // Not ES6 Destructing. Not object property shorthand
+                        export {
+                            Button,
+                            Header
+                        }
+                        ```
+                        ```dart
+                        // app.js
+                        // import { ImportList }
+                        import { Button, Header } from "./components";
+                        ```
+                    </script>
+                </section>
+                
                 <section data-markdown>
                     <script type="text/template">
                         ### *For more detail...*
