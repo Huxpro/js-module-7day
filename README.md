@@ -1,5 +1,7 @@
 # JavaScript Modularization *Journey*
 
+> 这里的内容是 2015 年左右的，所以请带着历史眼光来看 —— Hux，2019
+
 ### ( JavaScript 模块化*七日谈 )*
 
 ### [Watch Slides → ](http://huangxuan.me/js-module-7day)
