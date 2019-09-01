@@ -1,0 +1,1648 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>JavaScript Modularization Journey</title>
+
+        <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+        <meta name="author" content="Hakim El Hattab">
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/wx.css" id="theme">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+
+                <section style="margin-top:2%" data-markdown>
+                    <script type="text/template">
+                        ## JavaScript 模块化*七日谈*
+
+                        <small>
+                            <a href="http://huangxuan.me/about">黄玄</a> /
+                            <a href="http://weibo.com/huxpro">@Huxpro</a>
+                        </small>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <img src="attach/hux.jpg" style="
+                            width: 200px;
+                            border-radius: 50%;
+                        "/>
+                        ## 黄玄
+                        微信电影票前端工程师
+
+                        <small>前阿里巴巴前端工程师</small>
+
+                        <small>
+                            <a href="http://huangxuan.me">Blog</a> /
+                            <a href="http://weibo.com/huxpro">@Huxpro</a> /
+                            <a href="https://github.com/huxpro">GitHub</a> /
+                            <a href="http://www.zhihu.com/people/huxpro">知乎</a>
+                        </small>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 为什么要模块化?
+
+                        # *web 在不断的发展*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <img src="attach/joke/js.jpg" style="width:360px;" />
+
+                        - 网站逐渐转变为 *Web App*
+
+                        - 代码 *复杂度* 随着网站规模的增长而增长
+
+                        - 需要高 *解耦* 的JS 文件/模块解决方案
+
+                        - 需要 *高效部署*，更优化的代码，更少的http请求
+                    </script>
+                </section>
+
+<!-- 第一日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第一日 上古时期
+
+                        # *Module?*
+
+                        从设计模式说起
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        最早，我们这么写代码
+
+                        ```javascript
+                        function foo(){
+                            //...
+                        }
+                        function bar(){
+                            //...
+                        }
+                        ```
+
+                        Global 被污染，很容易命名冲突
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        简单封装：*Namespace* 模式
+
+                        ```javascript
+                        var MYAPP = {
+                            foo: function(){},
+                            bar: function(){}
+                        }
+
+                        MYAPP.foo();
+                        ```
+
+                        - 减少 Global 上的变量数目
+                        <!-- .element: class="fragment" -->
+
+                        - 本质是对象，一点都不安全
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        匿名闭包 ：*IIFE* 模式
+
+                        ```javascript
+                        var Module = (function(){
+                            var _private = "safe now";
+                            var foo = function(){
+                                console.log(_private)
+                            }
+
+                            return {
+                                foo: foo
+                            }
+                        })()
+
+                        Module.foo();
+                        Module._private; // undefined
+                        ```
+
+                        函数是 JavaScript 唯一的 Local Scope
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        再增强一点 ：引入依赖
+
+                        ```javascript
+                        var Module = (function($){
+                            var _$body = $("body");     // we can use jQuery now!
+                            var foo = function(){
+                                console.log(_$body);    // 特权方法
+                            }
+
+                            // Revelation Pattern
+                            return {
+                                foo: foo
+                            }
+                        })(jQuery)
+
+                        Module.foo();
+
+                        ```
+
+                        <p class="fragment">
+                            这就是<em><b>模块模式</b></em><br>
+                            也是现代模块实现的基石
+                        </p>
+                    </script>
+                </section>
+
+<!-- 第二日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第二日 石器时代
+
+                        # *Script Loader*
+
+                        只有封装性可不够，我们还需要加载
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## 在 script 标签上做文章
+
+                        ```jade
+                        body
+                            script(src="jquery.js")
+                            script(src="app.js")    // do some $ things...
+                        ```
+
+                        顺序是必要的
+                        <!-- .element: class="fragment" -->
+
+                        并行加载
+                        <!-- .element: class="fragment" -->
+
+                        DOM 顺序即执行顺序
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        但现实是这样的…
+
+                        ```
+                        body
+                            script(src="zepto.js")
+                            script(src="jhash.js")
+                            script(src="fastClick.js")
+                            script(src="iScroll.js")
+                            script(src="underscore.js")
+                            script(src="handlebar.js")
+                            script(src="datacenter.js")
+                            script(src="deferred.js")
+                            script(src="util/wxbridge.js")
+                            script(src="util/login.js")
+                            script(src="util/base.js")
+                            script(src="util/city.js")
+                            script(src="util/date.js")
+                            script(src="util/cookie.js")
+                            script(src="app.js")
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown data-background="attach/bm_1.jpg"
+                    style="background:rgba(0,0,0,0.8)"
+                >
+                    <script type="text/template">
+                        - 难以维护
+
+                        - 依赖模糊
+
+                        - 请求过多
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [LABjs](http://labjs.com/) - script loader
+
+                        (2009)
+
+                        加载和阻塞 JavaScript
+
+
+                        > *使用 LABjs 能够避免<br >"script 标签乱炖"*
+
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        它是如何工作的?
+
+                        ```
+                        script(src="LAB.js" async)
+                        ```
+
+                        ```javascript
+                        $LAB.script("framework.js").wait()
+                            .script("plugin.framework.js")
+                            .script("myplugin.framework.js").wait()
+                            .script("init.js");
+                        ```
+                        <blockquote class="fragment"><p>并行执行? </p></blockquote>
+
+                        *先加载，先执行 <br> (当执行次序不重要时)*
+                        <!-- .element: class="fragment" -->
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        #### 语法糖
+
+                        ```javascript
+                        $LAB
+                        .script( [ "script1.js", "script2.js", "script3.js"] )
+                        .wait(function(){ // wait for all scripts to execute first
+                            script1Func();
+                            script2Func();
+                            script3Func();
+                        });
+                        ```
+                        *基于文件的依赖管理*
+                        <!-- .element: class="fragment" -->
+
+                    </script>
+                </section>
+
+<!-- 第三日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第三日 蒸汽朋克
+
+                        # *Module Loader*
+
+                        模块化架构的工业革命
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [YUI3](yuilibrary.com) Loader - Module Loader
+                        (2009)
+
+                        <img src="attach/yui-logo.png" class="logo" style="max-width:150px" />
+
+                        > *YUI 的轻量级核心和<br>**模块化架构**<br> 使模块构建可伸缩，快速且健壮 。*
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        回顾昔日王者的风采:
+
+                        ```javascript
+                        // YUI - 编写模块
+                        YUI.add('dom', function(Y) {
+                          Y.DOM = { ... }
+                        })
+
+                        // YUI - 使用模块
+                        YUI().use('dom', function(Y) {
+                          Y.DOM.doSomeThing();
+                        })
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *订制* 一个 *module*
+
+                        ```javascript
+                        // hello.js
+                        YUI.add('hello', function(Y){
+                            Y.sayHello = function(msg){
+                                Y.DOM.set(el, 'innerHTML', 'Hello!');
+                            }
+                        },'3.0.0',{
+                            requires:['dom']
+                        })
+                        ```
+                        ```
+                        // main.js
+                        YUI().use('hello', function(Y){
+                            Y.sayHello("hey yui loader");
+                        })
+                        ```
+
+                        *基于模块的依赖管理*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        再深入一点点...
+
+                        ```javascript
+                        // Sandbox Implementation
+                        function Sandbox() {
+                            // ...
+                            // initialize the required modules
+                            for (i = 0; i < modules.length; i += 1) {
+                                Sandbox.modules[modules[i]](this);
+                            }
+                            // ...
+                        }
+                        ```
+
+                        Y 其实是一个强沙箱
+                        <!-- .element: class="fragment" -->
+
+                        所有依赖模块通过 attach 的方式被注入沙盒
+                        <!-- .element: class="fragment" -->
+
+                        *attach：在当前 YUI 实例上执行模块的初始化代码，使得模块在当前实例上可用*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        还是 Script 标签*乱炖*吗?
+
+                        ```javascript
+                        script(src="/path/to/yui-min.js")       // YUI seed
+                        script(src="/path/to/my/module1.js")    // add('module1')
+                        script(src="/path/to/my/module2.js")    // add('module2')
+                        script(src="/path/to/my/module3.js")    // add('module3')
+                        ```
+                        ```
+                        YUI().use('module1', 'module2', 'module3', function(Y) {
+                            // 这里可以引入的module了
+                        });
+                        ```
+
+                        <em>
+                            <ul class="fragment">
+                                <li>你不用再关心 js 加载次序了</li>
+                                <li>加载和执行，从此分开了</li>
+                            </ul>
+                        </em>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        漏了一个问题？ *太多的 HTTP 请求*
+                        <!-- .element: class="fragment" -->
+
+                        ## YUI Combo
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        Combo 工作方式
+
+                        ```jade
+                        script(src="http://yui.yahooapis.com/3.0.0/build/yui/yui-min.js")
+                        script(src="http://yui.yahooapis.com/3.0.0/build/dom/dom-min.js")
+                        ```
+
+                        ↓ <small style="margin:14px"> magic combo </small>
+
+                        ```jade
+                        script(src="http://yui.yahooapis.com/combo?
+                            3.0.0/build/yui/yui-min.js&
+                            3.0.0/build/dom/dom-min.js")
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        *在一个请求中包含多个文件*
+                        <!-- .element: class="fragment" -->
+
+                        GET 请求，需要服务器支持
+                        <!-- .element: class="fragment" -->
+
+                        [alibaba/nginx-http-concat](https://github.com/alibaba/nginx-http-concat)
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template" >
+                        <img src="attach/joke/3.jpg" height="300px" width="300px" />
+
+                        - 合并 *Concat*
+
+                        - 压缩 *Minify*
+
+                        - 混淆 *Uglify*
+
+                    </script>
+                </section>
+
+<!-- 第四日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第四日 号角吹响
+
+                        # *CommonJS*
+
+                        征服世界的第一步是跳出浏览器
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [CommonJS](http://www.commonjs.org/) - API Standard
+
+                        (2009.08)
+
+                        <img src="attach/commonjs-logo.png" class="logo" style="max-width:200px" />
+
+                        > *javascript<br> 不再是浏览器的专利 !*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        # [Modules/1.0](http://wiki.commonjs.org/wiki/Modules/1.0)
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        模块的定义与引用
+
+                        ```javascript
+                        // math.js
+                        exports.add = function(a, b){
+                            return a + b;
+                        }
+                        ```
+                        ```javascript
+                        // main.js
+                        var math = require('math')      // ./math in node
+                        console.log(math.add(1, 2));    // 3
+                        ```
+
+                        *Magic Free Variable*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        [NodeJS](http://nodejs.org) : 简单的 HTTP 服务器
+
+                        ```javascript
+                        // server.js
+                        var http = require("http"),
+                            PORT = 8000;
+
+                        http.createServer(function(req, res){
+                            res.end("Hello World");
+                        }).listen(PORT);
+
+                        console.log("listenning to " + PORT);
+                        ```
+                        ```
+                        $ node server.js
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        #### 同步
+
+                        ```javascript
+                        // timeout.js
+                        var EXE_TIME = 2;
+
+                        (function(second){
+                            var start = +new Date();
+                            while(start + second*1000 > new Date()){}
+                        })(EXE_TIME)
+
+                        console.log("2000ms executed")
+                        ```
+                        ```
+                        // main.js
+                        require('./timeout');   // sync load
+                        console.log('done!');
+                        ```
+
+                        *同步/阻塞式加载*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        同步加载对服务器/本地环境并不是问题
+
+                        <br>
+
+                         硬盘 I/O | | 网速 I/O
+                        -----|------- | ------|-------
+                        HDD: | *100 MB/s*  | ADSL: | *4 Mb/s*
+                        SSD: | *600 MB/s*  | 4G: | *100 Mb/s*
+                        SATA-III:| *6000 Mb/s*  | Fiber: | *100 Mb/s*
+
+                        <br>
+
+                        ### *浏览器环境才是问题！*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+<!-- 第五日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第五日 双塔奇兵
+
+                        # *AMD/CMD*
+
+                        浏览器环境模块化方案
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        分歧和冲突
+
+                        ## *[Modules/Async](http://wiki.commonjs.org/wiki/Modules/AsynchronousDefinition)*
+                        ## *[Modules/Wrappings](http://wiki.commonjs.org/wiki/Modules/Wrappings)*
+
+                        <div class="fragment">
+
+                        <h3>*Modules/Transport*</h3>
+                        <h4>*<del>Modules/2.0</del>*</h4>
+
+                        </div>
+
+                        <small style="margin-top:15px">
+                            [《前端模块化开发的那点历史 - 玉伯》](https://github.com/seajs/seajs/issues/588)
+                        </small>
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## *[AMD(Async Module Definition)](http://wiki.commonjs.org/wiki/Modules/AsynchronousDefinition)*
+
+                        RequireJS 对模块定义的规范化产出
+
+                        <br>
+
+                        ## *[CMD(Common Module Definition)](https://github.com/cmdjs/specification/blob/master/draft/module.md)*
+
+                        SeaJS 对模块定义的规范化产出
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [RequireJS](http://requirejs.org/) - AMD 实现
+
+                        (2011)
+
+                        <img src="attach/requirejs-logo.svg"
+                            class="logo"
+                            style="max-width:130px; margin:0px" />
+
+                        > *JavaScript 文件和模块加载器<br> 据说是浏览器端的最优方案*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        加入 `require()` 是异步的?
+
+                        ```
+                        //CommonJS Syntax
+                        var Employee = require("types/Employee");
+
+                        function Programmer (){
+                            //do something
+                        }
+
+                        Programmer.prototype = new Employee();
+
+                        //如果 require call 是异步的，那么肯定 error
+                        //因为在执行这句前 Employee 模块根本来不及加载进来
+                        ```
+
+                        *以上代码根本无法工作*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Function Wrapping*
+
+                        ```
+                        //AMD Wrapper
+                        define(
+                            ["types/Employee"],  //依赖
+                            function(Employee){  //这个回调会在所有依赖都被加载后才执行
+                                function Programmer(){
+                                    //do something
+                                };
+
+                                Programmer.prototype = new Employee();
+                                return Programmer;  //return Constructor
+                            }
+                        )
+
+                        ```
+                        似曾相识么?
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *语法糖 - 简化的 CommonJS wrapping*
+
+                        ```javascript
+                        define(function (require) {
+                            var dependency1 = require('dependency1'),
+                                dependency2 = require('dependency2');
+
+                            return function () {};
+                        });
+                        ```
+                        ```javascript
+                        // 解析 require...
+                        define(
+                            ['require', 'dependency1', 'dependency2'],
+                        function (require) {
+                            var dependency1 = require('dependency1'),
+                                dependency2 = require('dependency2');
+
+                            return function () {};
+                        });
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *AMD vs CommonJS*
+
+                        ### 书写风格
+
+                        ```javascript
+                        // Module/1.0
+                        var a = require("./a");  // 依赖就近
+                        a.doSomething();
+
+                        var b = require("./b")
+                        b.doSomething();
+                        ```
+
+                        ```javascript
+                        // AMD 推荐风格
+                        define(["a", "b"], function(a, b){ // 依赖前置
+                            a.doSomething();
+                            b.doSomething();
+                        })
+                        ```
+
+                        *都行*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *AMD vs CommonJS*
+
+                        ### 执行时机
+
+                        ```
+                        // Module/1.0
+                        var a = require("./a");  // 执行到此时，a.js 同步下载并执行
+                        ```
+
+                        ```
+                        // AMD 联合 CommonJS sugar
+                        define(["require"], function(require){
+                            // 在这里， a.js 已经下载并且执行好了
+                            var a = require("./a")
+                        })
+
+                        ```
+
+                        *提早下载, 提早执行*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [SeaJS](http://seajs.org/docs/) - CMD 实现
+
+                        (2011)
+
+                        <img src="attach/seajs-logo.png" class="logo" />
+
+                        > *提供简单、极致的模块化开发体验*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *更像 CommonJS 的风格*
+
+                        ```javascript
+                        define(function(require, exports) {
+                            var a = require('./a');
+                            a.doSomething();
+
+                            exports.foo = 'bar';
+                            exports.doSomething = function() {};
+                        });
+                        ```
+                        ```javascript
+                        // RequireJS 兼容风格
+                        define('hello', ['jquery'], function(require, exports, module) {
+                            return {
+                                foo: 'bar',
+                                doSomething: function() {}
+                            };
+                        });
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *AMD vs CMD - 本质的区别*
+
+                        ### 仍然是执行时机
+
+                        ```
+                        // AMD 推荐风格
+                        define(['a', 'b'], function(a, b){
+                            a.doSomething();    // 依赖前置，提前执行
+                            b.doSomething();
+                        })
+                        ```
+                        ```
+                        // CMD 推荐风格
+                        define(function(require, exports, module){
+                            var a = require("a");
+                            a.doSomething();
+                            var b = require("b");
+                            b.doSomething();    // 依赖就近，延迟执行
+                        })
+
+                        ```
+
+                        *提早下载, 延迟执行*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *RequireJS 最佳实践*
+                        <small style="
+                            vertical-align: baseline;
+                            margin-left: 10px;
+                        ">
+                            <a href="#/47">跳过</a>
+                        </small>
+
+                        ### Use Case
+
+                        ```javascript
+                        require([
+                            'React',    // 尽量使用 ModuleID
+                            'IScroll',
+                            'FastClick'
+                            'navBar',   // 和同目录下的 js 文件
+                            'tabBar',
+                        ], function(
+                            React,      // Export
+                            IScroll
+                            FastClick
+                            NavBar,
+                            TabBar,
+                        ) {
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *RequireJS 最佳实践*
+
+                        ### Config
+
+                        ```javascript
+                        require.config({
+                            // 查找根路径，当加载包含协议或以/开头、.js结尾的文件时不启用
+                            baseUrl: "./js",
+                            // 配置 ModuleID 与 路径 的映射
+                            paths: {
+                                React: "lib/react-with-addons",
+                                FastClick: "http://cdn.bootcss.com/fastclick/1.0.3/fastclick.min",
+                                IScroll: "lib/iscroll",
+                            },
+                            // 为那些“全局变量注入”型脚本做依赖和导出配置
+                            shim: {
+                                'IScroll': {
+                                    exports: "IScroll"
+                                },
+                            },
+                            // 从 CommonJS 包中加载模块
+                            packages: [
+                                {
+                                    name: "ReactChart",
+                                    location: "lib/react-chart",
+                                    main: "index"
+                                }
+                            ]
+                        })
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *RequireJS 最佳实践*
+
+                        ### Optimized Build
+
+                        ```bash
+                        node r.js -o build.js
+                        ```
+                        ```javascript
+                        // build.js
+                        // 简单的说，要把所有配置 repeat 一遍
+                        ({
+                            appDir: './src',
+                            baseUrl: './js',
+                            dir: './dist',
+                            modules: [
+                                {
+                                    name: 'app'
+                                }
+                            ],
+                            fileExclusionRegExp: /^(r|build)\.js$/,
+                            optimizeCss: 'standard',
+                            removeCombined: true,
+                            paths: {
+                                React : "lib/react-with-addons",
+                                FastClick: "http://cdn.bootcss.com/fastclick/1.0.3/fastclick.min",
+                                IScroll: "lib/iscroll"
+                            },
+                            shim: {
+                                'IScroll': {
+                                    exports: "IScroll"
+                                },
+                            },
+                            packages: [
+                                {
+                                    name: "ReactChart",
+                                    location: "lib/react-chart",
+                                    main: "index"
+                                }
+                            ]
+                        })
+                        ```
+                    </script>
+                </section>
+
+<!-- 第六日 --->
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第六日 精灵宝钻
+
+                        # *Browserify/Webpack*
+
+                        大势所趋，去掉这层包裹！
+                    </script>
+                </section>
+
+                <section data-markdown data-background="attach/npm.png"
+                    style="background: rgba(0,0,0,0.7)"
+                >
+                    <script type="text/template">
+                        # *[NPM](https://www.npmjs.com/)*
+                        Node Package Manger
+
+                        *浏览器并没有 require 机制, <br>但是 nodejs 有。*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [Browserify](http://browserify.org/) - CommonJS in browser
+
+                        (2011 / 2014 stable)
+
+                        <img src="attach/browserify-logo.png" class="logo" style="width:320px;margin-bottom:-40px" />
+
+                        > *帮你打包所有 require 的依赖*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        Install
+
+                        ```
+                        $ npm install -g browserify
+                        ```
+                        ### *写 CommonJS 风格的代码就好!*
+                        <!-- .element: class="fragment" -->
+
+                        ```
+                        # 奇迹发生了!
+                        $ browserify main.js -o bundle.js
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        #### *演示*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        深入一点点...
+
+                        *通过遍历项目所有模块的依赖关系，Browserify 解析出 require() 的 AST*
+
+                        ### [AST: Abstract Syntax Tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree)
+                        <!-- .element: class="fragment" -->
+
+                        <img src="attach/ast.png" class="logo fragment" style="width:320px;" />
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        每一次改动都需要手动编译 ？
+
+                        不, 自动编译 。
+
+                        ## *Watch - [Watchify](https://www.npmjs.com/package/watchify)*
+                        <!-- .element: class="fragment" -->
+
+                        ```
+                        $ npm install -g watchify
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        ```
+                        # WATCH!
+                        $ watchify app.js -o bundle.js -v
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        Build 后要如何 Debug
+
+                        ## *Source Map*
+                        <!-- .element: class="fragment" -->
+
+                        ```bash
+                        # debug mode
+                        $ browserify main.js -o bundle.js --debug
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        *逆向所有合并、压缩、混淆！*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## *`npm run`*
+
+                        ```
+                        $ npm run [command] [-- <args>]
+                        ```
+                        <!-- .element: class="fragment" -->
+
+                        ```javascript
+                        // package.json
+                        {
+                            //....
+                            "scripts": {
+                                "build": "browserify app.js -o bundle.js",
+                                "watch": "watchify app.js -o bundle.js -v"
+                            }
+                        }
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [Webpack](http://webpack.github.io/) - Module Bundler
+
+                        (2014)
+
+                        <img src="attach/webpack-icon.png" class="logo" style="width:320px;margin-bottom:-60px" />
+
+                        > *转换和打包资源文件*
+                    </script>
+                </section>
+
+
+
+                <section data-markdown>
+                    <script type="text/template">
+                        对 Browserify 的支持
+
+                        ```bash
+                        # These are equivalent:
+                        $ browserify main.js > bundle.js
+                        $ webpack main.js bundle.js
+                        ```
+
+                        *但是*
+                        ```javascript
+                        // 推荐使用标准的配置文件 webpack.config.js
+                        module.exports = {
+                            entry: "./main.js",
+                            output: {
+                                filename: "bundle.js"
+                            }
+                        }
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *简单的 [CLI](http://webpack.github.io/docs/cli.html)*
+
+                        ```bash
+                        # 确保目录中包含 webpack.config.js
+
+                        # Development: debug + devtool + source-map + pathinfo
+                        webpack main.js bundle.js -d
+
+                        # Production: minimize + occurence-order
+                        webpack main.js bundle.js -p
+
+                        # Watch Mode
+                        webpack main.js bundle.js --watch
+                        ```
+
+                        你需要的都在这里啦!
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        *Browserify vs Webpack*
+
+                        ## 小而美 VS 大而全
+
+                        <br>
+
+                        - [Browserify VS Webpack - JS Drama](http://blog.namangoel.com/browserify-vs-webpack-js-drama)
+                        - [Comparison - Webpack](http://webpack.github.io/docs/comparison.html)
+                        - [Webpack for browserify users](http://webpack.github.io/docs/webpack-for-browserify-users.html)
+                        - [Browserify for webpack users](https://gist.github.com/substack/68f8d502be42d5cd4942)
+
+                    </script>
+                </section>
+
+                <style>
+                    .bloom{
+                        transform: scale(0);
+                        transition: transform 0.7s cubic-bezier(0.68, 0.04, 0.49, 0.95);
+                    }
+                    .present .bloom{
+                        transform: scale(1);
+                    }
+                </style>
+                <section data-markdown>
+                    <script type="text/template">
+                        <div class="bloom">
+                            难道 webpack 只是另一个 Browserify ?
+                            <div>
+                                <h1>Webpack - *Like a pro* </h1>
+                                <p>webpack *特别增强篇*</p>
+                            </div>
+                            <img src="attach/webpack-icon.png" class="logo" width="220" />
+                        </div>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [Motivation](http://webpack.github.io/docs/motivation.html)
+
+                        - 兼容性 (CommonJS, AMD, ES6...)
+
+                        - 代码分割
+
+                        - 加载器 & 插件
+
+                        - 开发工具 & 工作流
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *[使用加载器](http://webpack.github.io/docs/using-loaders.html)*
+
+                        ```javascript
+                        // webpack.config.js
+                        module.exports = {
+                            entry: './main.js',
+                            output: {
+                                filename: 'bundle.js'
+                            }{,
+                            module: {
+                                loaders: [{
+                                    test: /\.js$/,
+                                    loader: 'babel-loader'
+                                }]
+                            }}
+                        }
+                        ```
+
+                        ***JSX 示例***
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## *[为什么只是模块化 JavaScript 呢 ?](http://webpack.github.io/docs/motivation.html#why-only-javascript)*
+
+                        > 其他 *静态资源* 也需要模块化
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *require()* 静态资源!
+
+                        ```javascript
+                        // 确保 css 加载
+                        require('./bootstrap.css');
+
+                        // 获取 URL 或者 DataURI
+                        var myImage = document.createElement('img');
+                        myImage.src = require('./myImage.jpg');
+                        ```
+
+                        <blockquote class="fragment">
+                            <p>他们也是 *依赖图* 的一部分</p>
+                        </blockquote>
+
+                        *包含静态资源的依赖管理*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *require()* 任何文件!
+
+                        ```javascript
+                        // CSS Preprocesser
+                        require('./style.less');
+                        require('./anotherStyle.scss');
+
+                        // Compile-to-JS Language
+                        var myModule = require('./myModule.coffee');
+                        var myTypedModule = require('./myTypedModule.ts');
+                        ```
+
+                        通用的模块系统
+                        <!-- .element: class="fragment" -->
+
+                        *对所有模块一视同仁的的依赖管理*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *Sass & Images*
+
+                        ```javascript
+                        var webpackConfig = {
+                            module: {
+                                loaders: [{
+                                    test: /\.scss$/,
+                                    loaders: 'style!css!sass'
+                                }, {
+                                    test: /\.(png|jpg|svg)$/,
+                                    loader: 'url?limit=20480' //20k
+                                }]
+                            }}
+                        }
+                        ```
+
+                        * 处理 CSS 的相关问题
+                        <!-- .element: class="fragment" -->
+
+                        * 插入图片的 DataURI
+                        <!-- .element: class="fragment" -->
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *[使用插件](http://webpack.github.io/docs/using-plugins.html)*
+
+                        ```javascript
+                        var config = {
+                            entry: ['webpack/hot/dev-server', './app/main.js'],
+                            module: {
+                                loaders: [{
+                                    test: /\.(js|jsx)$/,
+                                    loaders: ['react-hot', 'babel']
+                                }]
+                            },
+                            plugins: [
+                                //Enables Hot Modules Replacement
+                                new webpack.HotModuleReplacementPlugin(),
+                            ],
+                        };
+                        ```
+
+                        #### [React Hot Loader!](http://gaearon.github.io/react-hot-loader/)
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *[代码切割](http://webpack.github.io/docs/code-splitting.html)*
+
+                        > 将代码切割成可以按需加载的“chunks”。
+
+                        - [优化的常用模块](https://github.com/petehunt/webpack-howto#8-optimizing-common-code)
+                        <!-- .element: class="fragment" -->
+
+                        - [异步加载](https://github.com/petehunt/webpack-howto#9-async-loading)
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        更多资料
+
+                        ## [Webpack Howto (Pete Hunt)](https://github.com/petehunt/webpack-howto)
+                        ## [React Webpack Cookbook](http://christianalfoni.github.io/react-webpack-cookbook/index.html)
+
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### 第七日 王者归来
+
+                        # *ES6 Module*
+
+                        最后的战役
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### JavaScript 没有 module !
+
+                        <p class="fragment"> (直到 *ECMAScript 6*) </p>
+                        <!-- .element: class="fragment" -->
+
+                        ### 遗憾的是...还没有 Runtime...
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ## [Babel](https://babeljs.io/) - JavaScript Compiler
+
+                        (2015)
+
+                        <img src="attach/babel-logo.png" class="logo" style="width:300px;margin:0;margin-bottom:-50px" />
+
+                        > *让未来的 JavaScript 成为现实 。*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        起航吧!!
+
+                        ### *单一模块*
+
+                        ```dart
+                        // math.js
+                        export default math = {
+                            PI: 3.14,
+                            foo: function(){}
+                        }
+                        ```
+
+                        ```dart
+                        // app.js
+                        import math from "./math";
+                        math.PI
+                        ```
+
+                        ```
+                        # babel magic!
+                        $ babel-node app.js
+                        ```
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *像真的 ES6 一样*
+
+                        ```dart
+                        // components.js
+                        import Button from './Button';
+                        import Header from './Header';
+
+                        // use property value shorthand
+                        export {
+                            Button,
+                            Header
+                        }
+                        ```
+                        ```dart
+                        // app.js
+                        import { Button, Header } from "./components";
+                        ```
+
+                        *太太太太太太太棒了!*
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *各种导出*
+
+                        ```dart
+                        // export Declaration
+                        export function foo(){
+                            console.log('I am not bar.');
+                        }
+                        ```
+                        ```dart
+                        // export VariableStatement;
+                        export var PI = 3.14;
+                        export var bar = foo;   // function expression
+                        ```
+                        ```dart
+                        // export { ExportsList }
+                        var PI = 3.14;
+                        var foo = function(){};
+
+                        export { PI, foo };
+                        ```
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *各种导入*
+
+                        ```dart
+                        // import { ImportsList } from "module-name"
+                        import { PI } from "./math";
+                        import { PI, foo } from "module-name";
+                        ```
+
+                        ```dart
+                        // import IdentifierName as ImportedBinding
+                        import { foo as bar } from "./math";
+                        bar();  // use alias bar
+                        ```
+
+                        ```dart
+                        // import NameSpaceImport
+                        import * as math from "./math";
+                        math.PI
+                        math.foo()
+                        ```
+
+                        *[Airbnb JavaScript Style Guide - Modules](https://github.com/airbnb/javascript#modules)*
+                        <!-- .element: class="fragment" -->
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        ### *更多详细内容...*
+
+                        ## [ECMA-262/6.0/#Exports](http://www.ecma-international.org/ecma-262/6.0/#sec-exports)
+                        ## [ECMA-262/6.0/#Imports](http://www.ecma-international.org/ecma-262/6.0/#sec-imports)
+
+                        <span style="font-size:55px">“ </span>
+                        <small style="vertical-align:text-top"> 习惯了就会觉得很好用的 (´Д` ) ”</small>
+                        <span style="padding-left:22px"></span>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <div style="
+                            position: relative;
+                            margin-left: -300px;">
+                            <img src="attach/babel-logo.png" class="logo" style="width:300px;margin:0;margin-bottom:-35px" />
+                            <h1>*×*</h1>
+                            <h2 style="
+                                position: absolute;
+                                right: 150px;
+                                top:134px;
+                                font-style: italic;
+                            ">[= babelify](https://github.com/babel/babelify)</h2>
+                            <img src="attach/browserify-logo.png" class="logo" style="width:400px;margin-top:-70px" />
+                        </div>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <div style="
+                            position: relative;
+                            margin-left: -300px;">
+                            <img src="attach/babel-logo.png" class="logo" style="width:300px;margin:0;margin-bottom:-35px" />
+                            <h1>*×*</h1>
+                            <h2 style="
+                                position: absolute;
+                                right: 100px;
+                                top:134px;
+                                font-style: italic;
+                            ">[= babel-loader](https://github.com/babel/babel-loader)</h2>
+                            <img src="attach/webpack-icon.png" class="logo" style="width:380px;margin-top:-30px" />
+                        </div>
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        # *你的问题呢*
+                        喂，美女，你掉了一个问题 。
+
+
+                    </script>
+                </section>
+
+                <section data-markdown>
+                    <script type="text/template">
+                        <img src="attach/qrcode.png" style="
+                            box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3);
+                            width: 350px;
+                            height: 350px;
+                        " />
+
+                        #### [huangxuan.me/js-module-7day](http://huangxuan.me/js-module-7day/#/)
+
+                        <small style="font-size: 0.85em">
+                        *[Open Source @ Github](https://github.com/Huxpro/js-module-7day)*
+                        </small>
+                    </script>
+                </section>
+
+                <section style="text-align: left;">
+                    <h1>THE END</h1>
+
+                    <h5>黄玄</h5>
+                    <small>
+                        <a href="http://huangxuan.me">Blog</a> /
+                        <a href="http://weibo.com/huxpro">@Huxpro</a> /
+                        <a href="https://github.com/huxpro">GitHub</a> /
+                        <a href="http://www.zhihu.com/people/huxpro">知乎</a>
+                    </small>
+                </section>
+            </div>
+        </div>
+
+        <pre style="display:none"><code> force highlight.js work </code></pre>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+
+        </script>
+
+        <script type="text/javascript">
+            function codeEditor(){
+                var nodes = document.querySelectorAll("code");
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].setAttribute("contenteditable", '');
+                }
+                console.log('code editable now.');
+            }
+            window.codeEditor = codeEditor;
+
+            document.addEventListener('DOMContentLoaded', function(){
+                setTimeout(function(){
+                    codeEditor();
+                },1000)
+            })
+        </script>
+    </body>
+</html>
