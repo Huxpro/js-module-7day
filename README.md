@@ -4,9 +4,9 @@
 
 ### ( JavaScript 模块化*七日谈 )*
 
-### [Watch Slides → ](http://huangxuan.me/js-module-7day)
+### [Watch Slides → ](http://huxpro.github.io/js-module-7day)
 
-<img src="http://huangxuan.me/js-module-7day/attach/qrcode.png" width="350" />
+<img src="http://huxpro.github.io/js-module-7day/attach/qrcode.png" width="350" />
 
 ### Catalog
 
